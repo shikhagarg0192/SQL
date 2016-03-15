@@ -1,0 +1,29 @@
+select Top(10) percent *  from tag
+select GETDATE() as 'login date', @@CONNECTIONS as 'login id'
+
+select case when null is null then 'yup' else '' end 
+
+create table _1(name varchar(10) PRIMARY KEY ,age int)
+
+drop table _1
+
+select * from sys.indexes
+where object_id = (select object_id from sys.objects where name='_1') 
+
+exec sp_helpindex _1
+
+
+create table t(id int Primary key)
+
+insert into t values(1),(1),(7),(2),(4)
+
+select * from t
+
+delete from t
+
+select * from sys.dm_os_buffer_descriptors where database_id = 9
+
+select * from sys.indexes where object_id = (select object_id from sys.objects where name='sys.allocation_units')
+
+select * from sys.databases
+

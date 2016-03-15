@@ -1,0 +1,97 @@
+create table abc(id int, s varchar(9))
+
+declare @i as int
+set @i = 1
+
+while @i <= 10
+begin
+	insert into abc 
+	select 2*@i, concat(convert(varchar(9),@i),'ish')
+	set @i = @i + 1
+end
+
+alternate rows : 
+1 : 
+select id, s from
+(select row_number() over (order by id) as row , * from abc) A where A.row%2=0
+ 
+2 :
+with CTE as 
+(select row_number() over (order by id)as row , * from abc)
+select id, s from cte where cte.row%2=0
+ 
+ 
+create function decode(@var1 as int, @var2 as int, @var3 as int)
+returns int
+begin
+	return case when @var1 > 10 then @var2 else @var3
+end
+end
+
+select dbo.decode(9,20,13)
+
+
+generate random no.s from 0 to 9 :
+	select convert(int,10*rand())
+
+check which partition a no. belongs to : 
+
+----create partition function range1 (int)
+	as range for values (10,100,1000)
+
+	select $partition.range1(-2)	
+	
+	
+	
+Find the nth salary
+1 :	with cte as 
+(select top(10) id, salary, dense_rank() over (order by salary desc) as ranks
+from emp)
+select * from cte where ranks=5 (n=5)
+
+or use rank()
+
+2 : with cte as 
+(select row_number() over (order by salary desc) as rownum,* from emp)
+select salary from cte where rownum=5
+
+3 : select top 1 salary from (select top 5 salary from emp order by salary desc) a 
+order by a.salary
+
+4 : 
+select * from emp e where 4 = (select count(distinct salary) from emp e1 where e1.salary>e.salary) 
+
+5 :
+select min(salary) from emp where salary in (select distinct top 5 salary from emp order by salary desc)
+
+-------------------------
+remove duplicate rows without using rownum etc :
+
+--capture duplicate rows in hold table
+select * into hold from abc group by id,s having count(*)>1
+--delete them from original table
+delete abc from abc,hold where abc.id=hold.id and abc.s = hold.s
+--insert previous duplicate rows back
+insert into abc select * from hold
+
+---------------------------
+reversing a string without using reverse function
+
+DECLARE @StringToReverse VARCHAR(55)
+SET @StringToReverse = 'Reverse a string with out using REVERSE() function'
+--SELECT @StringToReverse AS string, CAST('' AS VARCHAR(55)) AS revStr, LEN(@StringToReverse) AS ln
+select substring(@StringToReverse,len(@StringToReverse),1)
+
+;WITH cte AS (
+      SELECT @StringToReverse AS string, CAST('' AS VARCHAR(55)) AS revStr, LEN(@StringToReverse) AS ln
+      UNION ALL
+      SELECT SUBSTRING(string,1,ln-1) AS string, 
+      CAST(revStr + SUBSTRING(string,ln,1) AS VARCHAR(55)) AS revStr, ln-1 AS ln
+      FROM cte
+      WHERE ln >= 1)
+SELECT  *
+FROM cte
+WHERE ln = 0
+
+
+-----------------

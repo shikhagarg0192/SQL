@@ -1,0 +1,37 @@
+--create database Test
+
+create table emp(
+ID int identity(1,1) NOT NULL PRIMARY KEY,
+first_name varchar(10),
+last_name varchar(10),
+salary decimal(7,2),
+start_date datetime,
+mgrid int);
+
+insert into emp values('jason','martin',5000,'2014-03-16',3),
+('alex','same',3000,'2014-03-16',1),
+('shelby','boss',4500,'2014-01-11',2),
+('caleb','hose',5800,'2014-04-12',3),
+('nimah','raina',9000,'2014-01-12',1);
+
+select * from emp
+
+
+--create unique nonclustered index uninon on emp(first_name)
+
+
+--create index i_emp on emp(id)
+
+--drop table emp
+
+--use Test
+
+select first_name,last_name, MIN(salary) from emp  group by first_name, last_name having MIN(salary)>5000
+
+select e.first_name, m.first_name as mgr_name from emp e join emp m on e.mgrid=m.ID
+
+--to copy the structure of table but data
+select * into new from emp where 1=0
+
+
+
